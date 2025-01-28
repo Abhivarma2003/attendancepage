@@ -5,31 +5,37 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    min-height: 100vh;
-  }
-  
-  .page-title {
+    position: absolute; /* Changed to absolute to allow footer alignment */
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures space is allocated for footer */
+}
+
+.page-title {
     text-align: center;
     color: #4a90e2;
-  }
-  
-  .info-box {
+}
+
+.info-box {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
-  }
-  
-  .button-container-left {
+}
+
+.button-container-left {
     display: flex;
     align-items: center;
-  }
-  
-  .button-container-right {
+}
+
+.button-container-right {
     display: flex;
-  }
-  
-  .info-heading {
+}
+
+.info-heading {
     margin-right: 20px;
     padding: 10px 20px;
     background-color: #4a90e2;
@@ -38,36 +44,36 @@
     border-radius: 5px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .attendance-table {
+}
+
+.attendance-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-  }
-  
-  .attendance-table th, .attendance-table td {
+    flex-grow: 1; /* Allows the table to take available space */
+    overflow-y: auto; /* Adds scroll if the table content overflows */
+}
+
+.attendance-table th, .attendance-table td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-  }
-  
-  .attendance-table th {
+}
+
+.attendance-table th {
     background-color: #4a90e2;
     color: white;
-  }
-  
-  .attendance-table tr:nth-child(even) {
+}
+
+.attendance-table tr:nth-child(even) {
     background-color: #f2f2f2;
-  }
-  
-  .footer {
+}
+
+.footer {
     text-align: center;
     padding: 10px;
     background-color: #4a90e2;
     color: white;
-    position: absolute;
-    bottom: 0;
     width: 100%;
     border-radius: 0 0 10px 10px;
-  }
+}
