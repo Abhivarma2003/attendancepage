@@ -18,6 +18,8 @@
 .page-title {
     text-align: center;
     color: #4a90e2;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 .info-box {
@@ -46,6 +48,10 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.info-heading:hover {
+    background-color: #357ab7;
+}
+
 .attendance-table {
     width: 100%;
     border-collapse: collapse;
@@ -69,6 +75,11 @@
     background-color: #f2f2f2;
 }
 
+.attendance-table td {
+    font-size: 14px;
+    color: #555;
+}
+
 .footer {
     text-align: center;
     padding: 10px;
@@ -76,4 +87,31 @@
     color: white;
     width: 100%;
     border-radius: 0 0 10px 10px;
+    margin-top: 20px;
 }
+
+.footer p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .attendance-container {
+        width: 100%;
+        margin: 10px;
+        padding: 10px;
+    }
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    .info-heading {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .attendance-table th, .attendance-table td {
+        padding: 8px;
+    }
+}
+
