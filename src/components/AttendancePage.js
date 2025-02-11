@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './AttendancePage.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -6,36 +6,126 @@ const AttendancePage = () => {
   const [data, setData] = useState([]);
   const [hasMore, setHasMore] = useState(true);
 
-  // Simulating a server call to fetch data
-  const fetchData = () => {
-    // Normally, you'd fetch data from an API here, for now, we simulate it
+  const calculateEffectiveHours = (startTime, endTime, breakTime, isOnLeave, isLate, isEarlyLeave, isAWOL, overtime) => {
+    const start = new Date(`2023-01-01T${startTime}:00`);
+    const end = new Date(`2023-01-01T${endTime}:00`);
+
+    let totalHoursWorked = (end - start) / 1000 / 60 / 60;
+    totalHoursWorked -= breakTime;
+
+    if (isOnLeave || isAWOL) {
+      return 0;
+    }
+
+    if (isLate) {
+      totalHoursWorked -= 0.5;
+    }
+    if (isEarlyLeave) {
+      totalHoursWorked -= 0.5;
+    }
+
+    totalHoursWorked += overtime;
+
+    return totalHoursWorked;
+  };
+
+  const calculateGrossHours = (startTime, endTime) => {
+    const start = new Date(`2023-01-01T${startTime}:00`);
+    const end = new Date(`2023-01-01T${endTime}:00`);
+
+    let totalHoursWorked = (end - start) / 1000 / 60 / 60;
+
+    return totalHoursWorked;
+  };
+
+  const fetchData = useCallback(() => {
     const newData = [
-      { date: '26 Jun 2023', leave: 'N', effectiveHours: '9:00 hrs', grossHours: '9:00 hrs', arrival: 'on time', log: '✔' },
-      { date: '27 Jun 2023', leave: 'N', effectiveHours: '9:00 hrs', grossHours: '9:00 hrs', arrival: 'on time', log: '✔' },
-      { date: '29 Jun 2023', leave: 'N', effectiveHours: '9:00 hrs', grossHours: '9:00 hrs', arrival: '0:06:25 late', log: '❌' },
-      { date: '1 Jul 2023', leave: 'N', effectiveHours: '0:00 hrs', grossHours: '0:00 hrs', arrival: '-', log: 'WH' },
-      { date: '7 Jul 2023', leave: 'Y', effectiveHours: '0:00 hrs', grossHours: '0:00 hrs', arrival: '-', log: 'EL' },
+      {
+        date: '26 Jun 2023',
+        leave: 'N',
+        startTime: '09:00',
+        endTime: '17:00',
+        breakTime: 1,
+        arrival: 'on time',
+        log: '✔',
+        isLate: false,
+        isEarlyLeave: false,
+        isAWOL: false,
+        overtime: 0
+      },
+      {
+        date: '27 Jun 2023',
+        leave: 'N',
+        startTime: '09:00',
+        endTime: '17:00',
+        breakTime: 1,
+        arrival: 'on time',
+        log: '✔',
+        isLate: false,
+        isEarlyLeave: false,
+        isAWOL: false,
+        overtime: 0
+      },
+      {
+        date: '29 Jun 2023',
+        leave: 'N',
+        startTime: '09:00',
+        endTime: '17:00',
+        breakTime: 1,
+        arrival: '0:06:25 late',
+        log: '❌',
+        isLate: true,
+        isEarlyLeave: false,
+        isAWOL: false,
+        overtime: 0
+      },
+      {
+        date: '1 Jul 2023',
+        leave: 'N',
+        startTime: '09:00',
+        endTime: '17:00',
+        breakTime: 1,
+        arrival: '-',
+        log: 'WH',
+        isLate: false,
+        isEarlyLeave: false,
+        isAWOL: false,
+        overtime: 0
+      },
+      {
+        date: '7 Jul 2023',
+        leave: 'Y',
+        startTime: '09:00',
+        endTime: '17:00',
+        breakTime: 1,
+        arrival: '-',
+        log: 'EL',
+        isLate: false,
+        isEarlyLeave: false,
+        isAWOL: true,
+        overtime: 0
+      },
       // Add more dummy data for testing
     ];
-    
+
     setTimeout(() => {
       setData((prevData) => [...prevData, ...newData]);
-      if (data.length >= 100) { // Limit the data to simulate an endpoint
+      if (data.length >= 100) {
         setHasMore(false);
       }
-    }, 1000);  // Simulate delay in fetching data
-  };
+    }, 1000);
+  }, [data]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   return (
     <div className="attendance-container">
       <h1 className="page-title">Attendance Page</h1>
       <div className="info-box">
         <div className="title-container-left">
-          <h3 className="info-title">Log& Request</h3>
+          <h3 className="info-title">Log & Request</h3>
         </div>
         <div className="button-container-right">
           <button className="info-heading">Attendance Log</button>
@@ -49,7 +139,7 @@ const AttendancePage = () => {
         hasMore={hasMore}
         loader={<h4>Loading...</h4>}
         endMessage={<p>No more data to load.</p>}
-        scrollThreshold={0.9}  // Load data when 90% of the page is scrolled
+        scrollThreshold={0.9}
         scrollableTarget="scrollableDiv"
       >
         <table className="attendance-table">
@@ -64,16 +154,29 @@ const AttendancePage = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((entry, index) => (
-              <tr key={index}>
-                <td>{entry.date}</td>
-                <td>{entry.leave}</td>
-                <td>{entry.effectiveHours}</td>
-                <td>{entry.grossHours}</td>
-                <td>{entry.arrival}</td>
-                <td>{entry.log}</td>
-              </tr>
-            ))}
+            {data.map((entry, index) => {
+              const effectiveHours = calculateEffectiveHours(
+                entry.startTime,
+                entry.endTime,
+                entry.breakTime,
+                entry.leave === 'Y',
+                entry.isLate,
+                entry.isEarlyLeave,
+                entry.isAWOL,
+                entry.overtime
+              );
+              const grossHours = calculateGrossHours(entry.startTime, entry.endTime);
+              return (
+                <tr key={index}>
+                  <td>{entry.date}</td>
+                  <td>{entry.leave}</td>
+                  <td>{effectiveHours} hrs</td>
+                  <td>{grossHours} hrs</td>
+                  <td>{entry.arrival}</td>
+                  <td>{entry.log}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </InfiniteScroll>
@@ -86,3 +189,4 @@ const AttendancePage = () => {
 };
 
 export default AttendancePage;
+
