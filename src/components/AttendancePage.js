@@ -105,7 +105,7 @@ const AttendancePage = () => {
         isAWOL: true,
         overtime: 0
       },
-      // Add more dummy data for testing
+      // dummy data
     ];
 
     setTimeout(() => {
